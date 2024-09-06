@@ -10,10 +10,11 @@ from logs.logging_config import logger
 class CSVDownloader:
     def __init__(self, num_station, date_start, date_end):
         self.base_url = BASE_URL
+        self.api_key = API_KEY
         self.num_station = num_station
         self.date_start = date_start
         self.date_end = date_end
-        self.api_key = API_KEY
+        self.download_is_complete = False
         self.save_path = (
             f"data_meteo_histo/{num_station}/from{extract_date(date_start)}_"
             f"to{extract_date(date_end)}.csv"
@@ -74,6 +75,7 @@ class CSVDownloader:
                     )
                 else:
                     logger.info(f"File already exists at {self.save_path}")
+                self.download_is_complete = True
                 return response.content
 
             else:

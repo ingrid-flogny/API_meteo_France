@@ -1,3 +1,4 @@
-from create_meteo_data_histo import download_histo_per_station
+from create_meteo_data_histo import download_histo_per_station, verify_files_histo_all_exist
 
-download_histo_per_station(59343001)
+#download_histo_per_station(59343001)
+verify_files_histo_all_exist(59343001)
