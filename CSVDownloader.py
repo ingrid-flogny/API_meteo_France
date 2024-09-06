@@ -2,7 +2,7 @@ import json
 import requests
 import time
 from config import API_KEY, BASE_URL
-from utils import extract_date
+from utils import extract_date, ensure_folder_exists
 
 
 class CSVDownloader:
@@ -12,7 +12,7 @@ class CSVDownloader:
         self.date_start = date_start
         self.date_end = date_end
         self.api_key = API_KEY
-        self.save_path = f"data_meteo_histo/{num_station}_from{extract_date(date_start)}_to{extract_date(date_end)}.csv"
+        self.save_path = f"data_meteo_histo/{num_station}/from{extract_date(date_start)}_to{extract_date(date_end)}.csv"
         self.headers = {
             "accept": "*/*",
             "Authorization": f"Bearer {self.api_key}"
@@ -43,6 +43,8 @@ class CSVDownloader:
                 print("Production encore en attente ou en cours.")
                 time.sleep(5)
             elif response.status_code == 201:
+                station_folder = f"data_meteo_histo/{self.num_station}"
+                ensure_folder_exists(station_folder)
                 with open(self.save_path, "wb") as file:
                     file.write(response.content)
                 print(f"File downloaded successfully and saved to {self.save_path}")
