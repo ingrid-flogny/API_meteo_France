@@ -3,7 +3,7 @@ import requests
 import time
 from config import API_KEY, BASE_URL
 from utils import extract_date, ensure_folder_exists
-from logging_config import logger
+from logs.logging_config import logger
 
 
 class CSVDownloader:
