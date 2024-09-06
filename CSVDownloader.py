@@ -25,6 +25,7 @@ class CSVDownloader:
         logger.info(f"Response Status Code:{response.status_code}")
 
         if response.status_code == 202:
+            logger.info(f"Request accepted for station {self.num_station} from {self.date_start} to {self.date_end}")
             return response.content
         else:
             logger.error(f"Response Content: {response.content}")
