@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from logs.logging_config import logger
 
+
 def extract_date(encoded_date: str) -> str:
     decoded_date = urllib.parse.unquote(encoded_date)
     parsed_date = datetime.strptime(decoded_date, "%Y-%m-%dT%H:%M:%SZ")

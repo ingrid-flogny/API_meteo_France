@@ -13,19 +13,29 @@ class CSVDownloader:
         self.date_start = date_start
         self.date_end = date_end
         self.api_key = API_KEY
-        self.save_path = f"data_meteo_histo/{num_station}/from{extract_date(date_start)}_to{extract_date(date_end)}.csv"
+        self.save_path = (
+            f"data_meteo_histo/{num_station}/from{extract_date(date_start)}_"
+            f"to{extract_date(date_end)}.csv"
+        )
         self.headers = {
             "accept": "*/*",
             "Authorization": f"Bearer {self.api_key}"
         }
 
     def get_command_number(self):
-        url = f"{self.base_url}/public/DPClim/v1/commande-station/quotidienne?id-station={self.num_station}&date-deb-periode={self.date_start}&date-fin-periode={self.date_end}"
+        url = (
+            f"{self.base_url}/public/DPClim/v1/commande-station/quotidienne?"
+            f"id-station={self.num_station}&date-deb-periode={self.date_start}&"
+            f"date-fin-periode={self.date_end}"
+        )
         response = requests.get(url, headers=self.headers)
         logger.info(f"Response Status Code:{response.status_code}")
 
         if response.status_code == 202:
-            logger.info(f"Request accepted for station {self.num_station} from {self.date_start} to {self.date_end}")
+            logger.info(
+                f"Request accepted for station {self.num_station} from "
+                f"{self.date_start} to {self.date_end}"
+            )
             return response.content
         else:
             logger.error(f"Response Content: {response.content}")
@@ -37,7 +47,10 @@ class CSVDownloader:
         return response_dict["elaboreProduitAvecDemandeResponse"]["return"]
 
     def download_csv(self, command_number):
-        url = f"{self.base_url}/public/DPClim/v1/commande/fichier?id-cmde={command_number}"
+        url = (
+            f"{self.base_url}/public/DPClim/v1/commande/fichier?"
+            f"id-cmde={command_number}"
+        )
 
         while True:
             response = requests.get(url, headers=self.headers)
@@ -54,7 +67,9 @@ class CSVDownloader:
                 # Save the file to the station folder
                 with open(self.save_path, "wb") as file:
                     file.write(response.content)
-                logger.info(f"File downloaded successfully and saved to {self.save_path}")
+                logger.info(
+                    f"File downloaded successfully and saved to {self.save_path}"
+                )
                 return response.content
 
             else:
@@ -69,6 +84,7 @@ class CSVDownloader:
             logger.error(f"HTTP error occurred: {http_err}")
         except Exception as err:
             logger.error(f"An error occurred: {err}")
+
 
 if __name__ == '__main__':
     downloader = CSVDownloader(
