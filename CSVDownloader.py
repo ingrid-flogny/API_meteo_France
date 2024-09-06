@@ -3,6 +3,7 @@ import requests
 import time
 from config import API_KEY, BASE_URL
 from utils import extract_date, ensure_folder_exists
+from logging_config import logger
 
 
 class CSVDownloader:
@@ -21,12 +22,12 @@ class CSVDownloader:
     def get_command_number(self):
         url = f"{self.base_url}/public/DPClim/v1/commande-station/quotidienne?id-station={self.num_station}&date-deb-periode={self.date_start}&date-fin-periode={self.date_end}"
         response = requests.get(url, headers=self.headers)
-        print("Response Status Code:", response.status_code)
+        logger.info(f"Response Status Code:{response.status_code}")
 
         if response.status_code == 202:
             return response.content
         else:
-            print("Response Content:", response.content)
+            logger.error(f"Response Content: {response.content}")
             response.raise_for_status()
 
     def extract_command_number(self, api_response):
@@ -36,21 +37,27 @@ class CSVDownloader:
 
     def download_csv(self, command_number):
         url = f"{self.base_url}/public/DPClim/v1/commande/fichier?id-cmde={command_number}"
+
         while True:
             response = requests.get(url, headers=self.headers)
-            print("Response Status Code:", response.status_code)
+            logger.info(f"Response Status Code:{response.status_code}")
+
             if response.status_code == 204:
-                print("Production encore en attente ou en cours.")
+                logger.info("Production encore en attente ou en cours.")
                 time.sleep(5)
+
             elif response.status_code == 201:
                 station_folder = f"data_meteo_histo/{self.num_station}"
                 ensure_folder_exists(station_folder)
+
+                # Save the file to the station folder
                 with open(self.save_path, "wb") as file:
                     file.write(response.content)
-                print(f"File downloaded successfully and saved to {self.save_path}")
+                logger.info(f"File downloaded successfully and saved to {self.save_path}")
                 return response.content
+
             else:
-                print("Response Content:", response.content)
+                logger.error(f"Response Content: {response.content}")
                 response.raise_for_status()
 
     def run(self):
@@ -58,9 +65,9 @@ class CSVDownloader:
             command_number = self.extract_command_number(self.get_command_number())
             self.download_csv(command_number)
         except requests.HTTPError as http_err:
-            print(f"HTTP error occurred: {http_err}")
+            logger.error(f"HTTP error occurred: {http_err}")
         except Exception as err:
-            print(f"An error occurred: {err}")
+            logger.error(f"An error occurred: {err}")
 
 if __name__ == '__main__':
     downloader = CSVDownloader(
