@@ -1,0 +1,3 @@
+from create_meteo_data_histo import download_histo_per_station
+
+download_histo_per_station(59343001)

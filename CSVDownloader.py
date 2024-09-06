@@ -1,6 +1,7 @@
 import json
 import requests
 import time
+import os
 from config import API_KEY, BASE_URL
 from utils import extract_date, ensure_folder_exists
 from logs.logging_config import logger
@@ -64,12 +65,15 @@ class CSVDownloader:
                 station_folder = f"data_meteo_histo/{self.num_station}"
                 ensure_folder_exists(station_folder)
 
-                # Save the file to the station folder
-                with open(self.save_path, "wb") as file:
-                    file.write(response.content)
-                logger.info(
-                    f"File downloaded successfully and saved to {self.save_path}"
-                )
+                # Save the file to the station folder if it doesn't exist
+                if not os.path.exists(self.save_path):
+                    with open(self.save_path, "wb") as file:
+                        file.write(response.content)
+                    logger.info(
+                        f"File downloaded successfully and saved to {self.save_path}"
+                    )
+                else:
+                    logger.info(f"File already exists at {self.save_path}")
                 return response.content
 
             else:
@@ -84,12 +88,3 @@ class CSVDownloader:
             logger.error(f"HTTP error occurred: {http_err}")
         except Exception as err:
             logger.error(f"An error occurred: {err}")
-
-
-if __name__ == '__main__':
-    downloader = CSVDownloader(
-        num_station=59343001,
-        date_start="2024-08-01T00%3A00%3A00Z",
-        date_end="2024-09-05T00%3A00%3A00Z"
-    )
-    downloader.run()
