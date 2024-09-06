@@ -1,2 +1,3 @@
 config.py
 data_meteo.csv
+data_meteo_histo/*
