@@ -63,6 +63,7 @@ class CSVDownloader:
                 time.sleep(5)
 
             elif response.status_code == 201:
+                logger.info("Downloading file...")
                 station_folder = f"data_meteo_histo/{self.num_station}"
                 ensure_folder_exists(station_folder)
 

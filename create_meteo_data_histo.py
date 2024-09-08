@@ -1,8 +1,16 @@
 import os
+from logging import raiseExceptions
+
 from logs.logging_config import logger
 from CSVDownloader import CSVDownloader
 from utils import extract_date
 
+
+"""==============================================================================================================
+
+Création des données météo historiques pour une station : 1 fichier par année et par station
+
+========================================================================================================================"""
 date_start_end= {
     "2017-01-01T00%3A00%3A00Z": "2018-01-01T00%3A00%3A00Z",
     "2018-01-01T00%3A00%3A00Z": "2019-01-01T00%3A00%3A00Z",
@@ -44,4 +52,39 @@ def verify_files_histo_all_exist(num_station: int):
                 if retry_count >= 5:
                     logger.error(f"Failed to download file {file_path} after 5 retries.")
                     return False
+
+    logger.info(f"All files for station {num_station} exist. Checking OK")
     return True
+
+
+"""=====================================================================================================
+
+Agglomération des données météo historiques pour une station : 1 fichier par station
+
+========================================================================================================="""
+
+def aggregate_histo_data(num_station: int):
+    station_folder = f"data_meteo_histo/{num_station}"
+    station_files = os.listdir(station_folder)
+    station_files.sort()
+    if len(station_files) == 0:
+        raise FileNotFoundError(f"No files found for station {num_station} in folder {station_folder}")
+
+    # Create the output file
+    output_file = f"data_meteo_histo/{num_station}/{num_station}_histo.csv"
+    with open(output_file, "w") as output:
+        # Write the header
+        with open(f"{station_folder}/{station_files[0]}", "r") as first_file:
+            header = first_file.readline()
+            output.write(header)
+
+        # Write the data
+        for file in station_files:
+            with open(f"{station_folder}/{file}", "r") as input_file:
+                # Skip the header
+                input_file.readline()
+                for line in input_file:
+                    output.write(line)
+
+    logger.info(f"Aggregation complete for station {num_station}. File saved to {output_file}")
+    return output_file
