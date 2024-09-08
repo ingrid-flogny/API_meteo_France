@@ -159,17 +159,17 @@ def solve_duplicates(dates: pd.Series, aggregated_file: str):
         logger.info(f"Duplicates removed from file {aggregated_file}")
     return True
 
-def solve_missing_dates(dates: pd.Series, aggregated_file: str):
-    dates = pd.to_datetime(dates)
-    date_range = pd.date_range(start=dates.min(), end=dates.max())
-    missing_dates = date_range[~date_range.isin(dates)]
-
-    if not missing_dates.empty:
-        logger.info(f"Filling missing dates...")
-        df = pd.read_csv(aggregated_file, sep=';', parse_dates=[1], dayfirst=True)
-        for date in missing_dates:
-            df = df.append({'DATE': date}, ignore_index=True)
-        df.sort_values(by='DATE', inplace=True)
-        df.to_csv(aggregated_file, sep=';', index=False)
-        logger.info(f"Missing dates filled in file {aggregated_file}")
-    return True
+# def solve_missing_dates(dates: pd.Series, aggregated_file: str):
+#     dates = pd.to_datetime(dates)
+#     date_range = pd.date_range(start=dates.min(), end=dates.max())
+#     missing_dates = date_range[~date_range.isin(dates)]
+#
+#     if not missing_dates.empty:
+#         logger.info(f"Filling missing dates...")
+#         df = pd.read_csv(aggregated_file, sep=';', parse_dates=[1], dayfirst=True)
+#         for date in missing_dates:
+#             convert_date_to_iso(date.strftime('%Y-%m-%d'))
+#         df.sort_values(by='DATE', inplace=True)
+#         df.to_csv(aggregated_file, sep=';', index=False)
+#         logger.info(f"Missing dates filled in file {aggregated_file}")
+#     return True
