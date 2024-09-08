@@ -100,15 +100,19 @@ def check_duplicated_dates(dates: pd.Series, aggregated_file: str) -> bool:
     if not duplicated_dates.empty:
         logger.error(f"Duplicate dates found in the file {aggregated_file}: {duplicated_dates.tolist()}")
         return False
+    logger.info(f"No duplicate dates found in the file {aggregated_file}")
     return True
 
 def check_missing_dates(dates: pd.Series, aggregated_file: str) -> bool:
+    dates = pd.to_datetime(dates)
     date_range = pd.date_range(start=dates.min(), end=dates.max())
-    missing_dates = date_range.difference(dates)
+    missing_dates = date_range[~date_range.isin(dates)]
 
     if not missing_dates.empty:
+        missing_dates = missing_dates.strftime('%Y-%m-%d').tolist()
         logger.error(f"Missing dates found in the file {aggregated_file}: {missing_dates}")
         return False
+    logger.info(f"No missing dates found in the file {aggregated_file}")
     return True
 
 
@@ -128,6 +132,7 @@ def verify_data_quality_in_histo_files(num_station: int):
 
     # Check for duplicate dates
     duplicates_check = check_duplicated_dates(dates, aggregated_file)
+    solve_duplicates(dates, aggregated_file)
 
     # Check for missing dates
     missing_dates_check = check_missing_dates(dates, aggregated_file)
@@ -144,3 +149,27 @@ Repairing historical data files
 
 ==========================================================================================================================="""
 
+def solve_duplicates(dates: pd.Series, aggregated_file: str):
+    duplicated_dates = dates[dates.duplicated()]
+    if not duplicated_dates.empty:
+        logger.info(f"Removing duplicates...")
+        df = pd.read_csv(aggregated_file, sep=';', parse_dates=[1], dayfirst=True)
+        df.drop_duplicates(subset='DATE', inplace=True)
+        df.to_csv(aggregated_file, sep=';', index=False)
+        logger.info(f"Duplicates removed from file {aggregated_file}")
+    return True
+
+def solve_missing_dates(dates: pd.Series, aggregated_file: str):
+    dates = pd.to_datetime(dates)
+    date_range = pd.date_range(start=dates.min(), end=dates.max())
+    missing_dates = date_range[~date_range.isin(dates)]
+
+    if not missing_dates.empty:
+        logger.info(f"Filling missing dates...")
+        df = pd.read_csv(aggregated_file, sep=';', parse_dates=[1], dayfirst=True)
+        for date in missing_dates:
+            df = df.append({'DATE': date}, ignore_index=True)
+        df.sort_values(by='DATE', inplace=True)
+        df.to_csv(aggregated_file, sep=';', index=False)
+        logger.info(f"Missing dates filled in file {aggregated_file}")
+    return True
