@@ -1,5 +1,5 @@
 import os
-from logging import raiseExceptions
+import pandas as pd
 
 from logs.logging_config import logger
 from CSVDownloader import CSVDownloader
@@ -88,3 +88,59 @@ def aggregate_histo_data(num_station: int):
 
     logger.info(f"Aggregation complete for station {num_station}. File saved to {output_file}")
     return output_file
+
+"""========================================================================================================
+
+Quality check for the aggregated historical data files
+
+=============================================================================================================="""
+
+def check_duplicated_dates(dates: pd.Series, aggregated_file: str) -> bool:
+    duplicated_dates = dates[dates.duplicated()]
+    if not duplicated_dates.empty:
+        logger.error(f"Duplicate dates found in the file {aggregated_file}: {duplicated_dates.tolist()}")
+        return False
+    return True
+
+def check_missing_dates(dates: pd.Series, aggregated_file: str) -> bool:
+    date_range = pd.date_range(start=dates.min(), end=dates.max())
+    missing_dates = date_range.difference(dates)
+
+    if not missing_dates.empty:
+        logger.error(f"Missing dates found in the file {aggregated_file}: {missing_dates}")
+        return False
+    return True
+
+
+def verify_data_quality_in_histo_files(num_station: int):
+    station_folder = f"data_meteo_histo/{num_station}"
+    aggregated_file = f"{station_folder}/{num_station}_histo.csv"
+
+    if not os.path.isfile(aggregated_file):
+        logger.error(f"Aggregated file {aggregated_file} does not exist.")
+        return False
+
+    # Read the aggregated file into a DataFrame
+    df = pd.read_csv(aggregated_file, sep=';', parse_dates=[1], dayfirst=True)
+
+    # Extract the date column
+    dates = df.iloc[:, 1]
+
+    # Check for duplicate dates
+    duplicates_check = check_duplicated_dates(dates, aggregated_file)
+
+    # Check for missing dates
+    missing_dates_check = check_missing_dates(dates, aggregated_file)
+
+    if duplicates_check and missing_dates_check:
+        logger.info(f"Data quality check passed for files {aggregated_file}: No duplicate or missing dates.")
+        return True
+    else:
+        return False
+
+"""======================================================================================================================
+
+Repairing historical data files
+
+==========================================================================================================================="""
+
