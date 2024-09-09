@@ -1,5 +1,6 @@
 import urllib.parse
 import os
+import pandas as pd
 from datetime import datetime
 from logs.logging_config import logger
 
@@ -55,3 +56,13 @@ def from_date_start_end_to_file_name(date_start: str, date_end: str) -> str:
 def from_date_start_end_to_path_name(station_number:int, date_start: str, date_end: str) -> str:
     file_name = f"data_meteo_histo/{station_number}/from{date_start}_to{date_end}.csv"
     return file_name
+
+
+"""=====================================================================================================
+CSV HISTO
+====================================================================================================="""
+
+def get_station_histo_df_from_csv(station_number: int) -> pd.DataFrame:
+    file_path = from_station_number_to_histo_file_path(station_number)
+    df = pd.read_csv(file_path, sep=';', parse_dates=[1], dayfirst=True)
+    return df
