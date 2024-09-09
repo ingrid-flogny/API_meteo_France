@@ -4,10 +4,9 @@ import time
 
 from logs.logging_config import logger
 from CSVDownloader import CSVDownloader
-from utils import extract_date, convert_date_to_iso, from_station_histo_file_name_to_station_number, \
-    from_station_number_to_histo_file_path, from_date_start_end_to_path_name, get_station_histo_df_from_csv
+from utils import extract_date, convert_date_to_iso, from_station_number_to_histo_file_path, from_date_start_end_to_path_name, get_station_histo_df_from_csv
 
-"""==============================================================================================================
+"""=======================================================================================================================
 
 Création des données météo historiques pour une station : 1 fichier par année et par station
 
@@ -23,7 +22,14 @@ date_start_end= {
     "2024-01-01T00%3A00%3A00Z": "2024-09-05T00%3A00%3A00Z",
 }
 
-def download_data_date(station_number: int, date_start, date_end):
+def download_data_date(station_number: int, date_start: str, date_end:str) -> bool:
+    """
+    Download the historical weather data for a station for a given date range.
+    :param station_number:
+    :param date_start: Date ISO format
+    :param date_end: Date ISO format
+    :return:
+    """
     downloader = CSVDownloader(
         num_station=station_number,
         date_start=date_start,
@@ -46,11 +52,23 @@ def download_data_date(station_number: int, date_start, date_end):
         f"Failed to download data for station {station_number} from {date_start} to {date_end} after {max_retries} attempts")
     return False
 
-def download_histo_per_station(num_station: int):
+def download_histo_per_station(num_station: int) -> bool:
+    """
+    Loop to download all historical data files for a station.
+    Date ranges are defined in the date_start_end dictionary.
+    :param num_station:
+    :return:
+    """
     for date_start, date_end in date_start_end.items():
-        download_data_date(num_station, date_start, date_end)
+        return download_data_date(num_station, date_start, date_end)
 
-def verify_files_histo_all_exist(num_station: int):
+def verify_files_histo_all_exist(num_station: int) -> bool:
+    """
+    Check if all historical weather data files exist for a station.
+    Date ranges are defined in the date_start_end dictionary.
+    :param num_station:
+    :return:
+    """
     for date_start, date_end in date_start_end.items():
         file_path = (
             f"data_meteo_histo/{num_station}/from{extract_date(date_start)}_"
@@ -70,7 +88,13 @@ Agglomération des données météo historiques pour une station : 1 fichier par
 
 ========================================================================================================="""
 
-def aggregate_histo_data(num_station: int):
+def aggregate_histo_data(num_station: int) -> bool:
+    """
+    Aggregate all historical weather data files for a station into a single file.
+    The final format is a CSV file : num_station_histo.csv
+    :param num_station:
+    :return:
+    """
     station_folder = f"data_meteo_histo/{num_station}"
     station_files = os.listdir(station_folder)
     station_files.sort()
@@ -94,7 +118,7 @@ def aggregate_histo_data(num_station: int):
                     output.write(line)
 
     logger.info(f"Aggregation complete for station {num_station}. File saved to {station_histo_file_path}")
-    return station_histo_file_path
+    return True
 
 """========================================================================================================
 
@@ -103,6 +127,11 @@ Quality check for the aggregated historical data files
 =============================================================================================================="""
 
 def check_duplicated_dates(num_station: int) -> bool:
+    """
+    Check for duplicate dates in the final historical data file of a station.
+    :param num_station:
+    :return:
+    """
     # Load station data histo file
     df = get_station_histo_df_from_csv(num_station)
     dates = df.iloc[:, 1]
@@ -117,6 +146,12 @@ def check_duplicated_dates(num_station: int) -> bool:
     return True
 
 def check_missing_dates(num_station: int) -> bool:
+    """
+    Check for missing dates in the final historical data file of a station.
+    Check for missing dates between min date and max date.
+    :param num_station:
+    :return:
+    """
     # Load station data histo file
     df = get_station_histo_df_from_csv(num_station)
     dates = df.iloc[:, 1]
@@ -137,8 +172,13 @@ def check_missing_dates(num_station: int) -> bool:
     logger.info(f"No missing dates found in the file {station_histo_file_path}")
     return True
 
-
-def verify_data_quality_in_histo_files(num_station: int):
+def verify_data_quality_in_histo_files(num_station: int) -> bool:
+    """
+    Verify the quality of the final historical data files for a station.
+    Quality checks : duplicates and missing dates.
+    :param num_station:
+    :return:
+    """
     station_histo_file_path = from_station_number_to_histo_file_path(num_station)
 
     if not os.path.isfile(station_histo_file_path):
@@ -167,6 +207,11 @@ Repairing historical data files
 ==========================================================================================================================="""
 
 def drop_date_duplicates(station_number: int) -> bool:
+    """
+    Drop duplicate dates in the final historical data file of a station.
+    :param station_number:
+    :return:
+    """
     # Load station data histo file
     df = get_station_histo_df_from_csv(station_number)
     dates = df.iloc[:, 1]
@@ -177,7 +222,6 @@ def drop_date_duplicates(station_number: int) -> bool:
 
     # Drop the duplicates
     if not duplicated_dates.empty:
-        logger.info(f"Removing duplicates...")
         df.drop_duplicates(subset='DATE', inplace=True)
         df.to_csv(station_histo_file_path, sep=';', index=False)
         logger.info(f"Duplicates removed from file {station_histo_file_path}")
@@ -185,7 +229,14 @@ def drop_date_duplicates(station_number: int) -> bool:
 
 
 
-def add_date_to_histo_file(file_paths: list, station_number: int):
+def add_date_to_histo_file(file_paths: list, station_number: int) -> bool:
+    """
+    Add the data from a list of files to the aggregated final historical data file of a station.
+    Add the data from files like from2017-01-01_to2018-01-01.csv to the final file 59343001_histo.csv
+    :param file_paths:
+    :param station_number:
+    :return:
+    """
     histo_file = from_station_number_to_histo_file_path(station_number)
 
     if not histo_file:
@@ -211,8 +262,16 @@ def add_date_to_histo_file(file_paths: list, station_number: int):
 
     logger.info(f"Aggregation complete. File saved to {histo_file}")
 
+    return True
 
-def download_and_add_data_missing_dates(num_station: int):
+
+def download_and_add_data_missing_dates(num_station: int) -> bool:
+    """
+    Download the missing data files for a station and add them to the aggregated final historical data file.
+    One file per missing date. One file is like from2017-01-01_to2017-01-01.csv
+    :param num_station:
+    :return:
+    """
     # Load station data histo file
     df = get_station_histo_df_from_csv(num_station)
     dates = df.iloc[:, 1]
@@ -225,7 +284,6 @@ def download_and_add_data_missing_dates(num_station: int):
     missing_dates = date_range[~date_range.isin(dates)]
 
     if not missing_dates.empty:
-        logger.info(f"Filling missing dates...")
         for date in missing_dates:
             date_iso = convert_date_to_iso(date.strftime('%Y-%m-%d'))
 

@@ -8,7 +8,18 @@ from logs.logging_config import logger
 
 
 class CSVDownloader:
-    def __init__(self, num_station, date_start, date_end):
+    """
+    Class to download the CSV file for a given station and date range.
+    CSV file contains weather data for a station for a given date range.
+    Date range must be 1 year maximum.
+    """
+    def __init__(self, num_station: int, date_start: str, date_end: str):
+        """
+
+        :param num_station: Station number
+        :param date_start: Date range start. Date ISO format.
+        :param date_end: Date range end. Date ISO format.
+        """
         self.base_url = BASE_URL
         self.api_key = API_KEY
         self.num_station = num_station
@@ -25,6 +36,11 @@ class CSVDownloader:
         }
 
     def get_command_number(self):
+        """
+        Get the command number for the given station and date range.
+        This command number will be used to download the CSV file.
+        :return:
+        """
         url = (
             f"{self.base_url}/public/DPClim/v1/commande-station/quotidienne?"
             f"id-station={self.num_station}&date-deb-periode={self.date_start}&"
@@ -44,11 +60,21 @@ class CSVDownloader:
             response.raise_for_status()
 
     def extract_command_number(self, api_response):
+        """
+        Extract the command number from the API response
+        :param api_response:
+        :return:
+        """
         response_str = api_response.decode("utf-8")
         response_dict = json.loads(response_str)
         return response_dict["elaboreProduitAvecDemandeResponse"]["return"]
 
-    def download_csv(self, command_number):
+    def download_csv(self, command_number: int):
+        """
+        Download the CSV file for the given command number
+        :param command_number:
+        :return:
+        """
         url = (
             f"{self.base_url}/public/DPClim/v1/commande/fichier?"
             f"id-cmde={command_number}"
@@ -84,6 +110,10 @@ class CSVDownloader:
                 response.raise_for_status()
 
     def run(self):
+        """
+        Run the downloader.
+        :return:
+        """
         try:
             command_number = self.extract_command_number(self.get_command_number())
             self.download_csv(command_number)
