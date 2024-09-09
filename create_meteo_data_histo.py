@@ -200,14 +200,8 @@ def add_date_to_histo_file(file_paths: list, station_number: int):
     # Append the data from all files
     for file_path in file_paths:
         df = pd.read_csv(file_path, sep=';', parse_dates=[1], dayfirst=True)
-        # if not pd.api.types.is_datetime64_any_dtype(df.iloc[:, 1]):
-        #     df.iloc[:, 1] = pd.to_datetime(df.iloc[:, 1], dayfirst=True)
-        #df['DATE'] = pd.to_datetime(df['DATE'], format='%Y-%m-%d', errors='coerce')
-        #.iloc[:, 1] = df.iloc[:, 1].dt.strftime('%Y-%m-%d')
         histo_df = pd.concat([histo_df, df], ignore_index=True)
         histo_df['DATE'] = pd.to_datetime(histo_df['DATE'], format='%Y-%m-%d', errors='coerce')
-        #histo_df.iloc[:, 1] = histo_df.iloc[:, 1].dt.strftime('%Y-%m-%d')
-        print("histo_df", histo_df.tail(10))
 
     # Remove any empty lines
     histo_df.dropna(how='all', inplace=True)
@@ -216,7 +210,6 @@ def add_date_to_histo_file(file_paths: list, station_number: int):
     histo_df.to_csv(histo_file, sep=';', index=False)
 
     logger.info(f"Aggregation complete. File saved to {histo_file}")
-
 
 
 def download_and_add_data_missing_dates(num_station: int):
@@ -241,7 +234,6 @@ def download_and_add_data_missing_dates(num_station: int):
 
     # Add the missing data to the aggregated file
     list_file_paths = [from_date_start_end_to_path_name(num_station, date_iso.strftime('%Y-%m-%d'), date_iso.strftime('%Y-%m-%d')) for date_iso in missing_dates]
-    print("list_file_paths", list_file_paths)
     add_date_to_histo_file(list_file_paths, num_station)
 
     logger.info(f"Missing dates files downloaded and added to {station_histo_file_path}")
