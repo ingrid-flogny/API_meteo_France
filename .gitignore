@@ -1,3 +1,5 @@
 config.py
 !data_meteo_histo/
 logs/app.log
+geolocalisation/data
+geolocalisation/logs/app.log

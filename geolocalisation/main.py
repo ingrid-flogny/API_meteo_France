@@ -1,0 +1,7 @@
+from geolocalisation.Station import Station
+from geolocalisation.create_station_geolocalisation_file import create_or_update_csv
+
+station_59343001 = Station(59343001)
+station_59343001.get_station_info()
+station_59343001.fill_station_info()
+create_or_update_csv(station_59343001)
