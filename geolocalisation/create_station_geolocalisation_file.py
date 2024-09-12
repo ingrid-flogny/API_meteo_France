@@ -2,6 +2,18 @@ import csv
 import os
 from logs.logging_config import logger
 
+list_departements_francais = list(range(1, 96)) + [
+    971,
+    972,
+    973,
+    974,
+    975,
+    984,
+    986,
+    987,
+    988,
+]
+
 
 def create_or_update_csv(station, csv_file="data/stations.csv"):
     """
