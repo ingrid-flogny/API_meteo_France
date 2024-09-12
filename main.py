@@ -1,5 +1,9 @@
-from create_meteo_data_histo import download_histo_per_station, verify_files_histo_all_exist, aggregate_histo_data, \
-    verify_data_quality_in_histo_files
+from create_meteo_data_histo import (
+    download_histo_per_station,
+    verify_files_histo_all_exist,
+    aggregate_histo_data,
+    verify_data_quality_in_histo_files,
+)
 
 # Download all historical data for a station
 download_histo_per_station(59343001)

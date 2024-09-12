@@ -13,6 +13,7 @@ class CSVDownloader:
     CSV file contains weather data for a station for a given date range.
     Date range must be 1 year maximum.
     """
+
     def __init__(self, num_station: int, date_start: str, date_end: str):
         """
 
@@ -30,10 +31,7 @@ class CSVDownloader:
             f"data_meteo_histo/{num_station}/from{extract_date(date_start)}_"
             f"to{extract_date(date_end)}.csv"
         )
-        self.headers = {
-            "accept": "*/*",
-            "Authorization": f"Bearer {self.api_key}"
-        }
+        self.headers = {"accept": "*/*", "Authorization": f"Bearer {self.api_key}"}
 
     def get_command_number(self):
         """
