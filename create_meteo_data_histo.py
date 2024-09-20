@@ -11,6 +11,13 @@ from utils import (
     from_date_start_end_to_path_name,
     get_station_histo_df_from_csv,
 )
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
+
 
 """=======================================================================================================================
 
@@ -29,7 +36,16 @@ date_start_end = {
 }
 
 
-def download_data_date(station_number: int, date_start: str, date_end: str) -> bool:
+@retry(
+    stop=stop_after_attempt(10),  # Max 10 attempts
+    wait=wait_exponential(
+        multiplier=1, min=2, max=60
+    ),  # Exponential backoff (2, 4, 8, ... max 60 seconds)
+    retry=retry_if_exception_type(Exception),
+)
+def download_weather_data_station_between_dates(
+    station_number: int, date_start: str, date_end: str
+) -> bool:
     """
     Download the historical weather data for a station for a given date range.
     :param station_number:
@@ -41,24 +57,18 @@ def download_data_date(station_number: int, date_start: str, date_end: str) -> b
         num_station=station_number, date_start=date_start, date_end=date_end
     )
 
-    retry_count = 0
-    max_retries = 10
-    while not downloader.download_is_complete and retry_count < max_retries:
+    try:
         downloader.run()
-        retry_count += 1
         if downloader.download_is_complete:
             logger.info(
                 f"Download successful for station {station_number} from {date_start} to {date_end}"
             )
             return True
-        else:
-            logger.warning(
-                f"Download attempt {retry_count} failed for station {station_number} from {date_start} to {date_end}"
-            )
 
-    logger.error(
-        f"Failed to download data for station {station_number} from {date_start} to {date_end} after {max_retries} attempts"
-    )
+    except Exception as e:
+        logger.error(
+            f"An unexpected error occurred while downloading data for station {station_number} from {date_start} to {date_end}: {e}"
+        )
     return False
 
 
@@ -70,7 +80,9 @@ def download_histo_per_station(num_station: int) -> bool:
     :return:
     """
     for date_start, date_end in date_start_end.items():
-        return download_data_date(num_station, date_start, date_end)
+        return download_weather_data_station_between_dates(
+            num_station, date_start, date_end
+        )
 
 
 def verify_files_histo_all_exist(num_station: int) -> bool:
@@ -87,7 +99,9 @@ def verify_files_histo_all_exist(num_station: int) -> bool:
         )
         if not os.path.isfile(file_path):
             logger.info(f"File {file_path} does not exist.")
-            download_data_date(num_station, date_start, date_end)
+            download_weather_data_station_between_dates(
+                num_station, date_start, date_end
+            )
 
     logger.info(f"All files for station {num_station} exist. Checking OK")
     return True
@@ -317,7 +331,7 @@ def download_and_add_data_missing_dates(num_station: int) -> bool:
             date_iso = convert_date_to_iso(date.strftime("%Y-%m-%d"))
 
             # Download the missing data
-            download_data_date(num_station, date_iso, date_iso)
+            download_weather_data_station_between_dates(num_station, date_iso, date_iso)
 
     # Add the missing data to the aggregated file
     list_file_paths = [

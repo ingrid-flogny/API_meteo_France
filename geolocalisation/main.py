@@ -16,7 +16,5 @@ list_departements_francais = list(range(1, 96)) + [
 ]
 list_all_departements = []
 
-# create_or_update_csv_with_departement_stations_info(2)
-
 for num_departement in list_departements_francais:
     create_or_update_csv_with_departement_stations_info(num_departement)

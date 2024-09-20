@@ -5,6 +5,12 @@ import os
 from config import API_KEY, BASE_URL
 from utils import extract_date, ensure_folder_exists
 from logs.logging_config import logger
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
 
 
 class CSVDownloader:
@@ -33,6 +39,15 @@ class CSVDownloader:
         )
         self.headers = {"accept": "*/*", "Authorization": f"Bearer {self.api_key}"}
 
+    @retry(
+        stop=stop_after_attempt(10),
+        wait=wait_exponential(
+            multiplier=1, min=2, max=60
+        ),  # Exponential backoff (2, 4, 8, ... max 60 seconds)
+        retry=retry_if_exception_type(
+            requests.exceptions.RequestException
+        ),  # Retry for request exceptions
+    )
     def get_command_number(self):
         """
         Get the command number for the given station and date range.
@@ -67,6 +82,15 @@ class CSVDownloader:
         response_dict = json.loads(response_str)
         return response_dict["elaboreProduitAvecDemandeResponse"]["return"]
 
+    @retry(
+        stop=stop_after_attempt(10),
+        wait=wait_exponential(
+            multiplier=1, min=2, max=60
+        ),  # Exponential backoff (2, 4, 8, ... max 60 seconds)
+        retry=retry_if_exception_type(
+            requests.exceptions.RequestException
+        ),  # Retry for request exceptions
+    )
     def download_csv(self, command_number: int):
         """
         Download the CSV file for the given command number
