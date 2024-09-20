@@ -63,6 +63,18 @@ def load_json_from_bytes(json_bytes: bytes) -> List[Dict[str, Any]]:
     return json.loads(json_output)
 
 
+def get_open_weather_stations(
+    stations_data: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """
+    Filter out stations that are not open.
+    :param stations_data:
+    :return:
+    """
+    stations_data = [station for station in stations_data if station["posteOuvert"]]
+    return stations_data
+
+
 def get_list_stations_in_a_departement(num_departement: int) -> List[int]:
     """
     Get the list of station IDs from a departement.
@@ -84,7 +96,7 @@ def get_list_stations_in_a_departement(num_departement: int) -> List[int]:
         raise
 
 
-def write_station_data_to_csv(stations_data: List[Dict[str, Any]], csv_file: str):
+def write_open_station_data_to_csv(stations_data: List[Dict[str, Any]], csv_file: str):
     """
     Write station data to a CSV file.
     :param stations_data: List of dictionaries containing station data.
@@ -97,6 +109,9 @@ def write_station_data_to_csv(stations_data: List[Dict[str, Any]], csv_file: str
 
         if not file_exists:
             writer.writerow(["id_station", "name", "longitude", "latitude", "altitude"])
+
+        # Recuperation uniquement des stations ouvertes
+        stations_data = get_open_weather_stations(stations_data)
 
         for station in stations_data:
             writer.writerow(
@@ -124,7 +139,7 @@ def create_or_update_csv_with_departement_stations_info(
             num_departement
         )
         stations_data = load_json_from_bytes(info_stations_per_departement)
-        write_station_data_to_csv(stations_data, csv_file)
+        write_open_station_data_to_csv(stations_data, csv_file)
         logger.info(
             f"Successfully updated {csv_file} with departement {num_departement}"
         )
