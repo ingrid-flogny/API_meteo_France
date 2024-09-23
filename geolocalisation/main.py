@@ -1,4 +1,3 @@
-from geolocalisation.Station import Station
 from geolocalisation.create_station_geolocalisation_file import (
     create_or_update_csv_with_departement_stations_info,
 )

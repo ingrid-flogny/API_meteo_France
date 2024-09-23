@@ -116,3 +116,31 @@ def get_station_histo_df_from_csv(station_number: int) -> pd.DataFrame:
     file_path = from_station_number_to_histo_file_path(station_number)
     df = pd.read_csv(file_path, sep=";", parse_dates=[1], dayfirst=True)
     return df
+
+
+"""=====================================================================================================
+Change column names
+====================================================================================================="""
+
+
+def rename_columns_using_mapping(description_file_path: str, histo_file_path: str):
+    """
+    Rename the columns in the historical data file using the mapping in the description file.
+    :param description_file_path:
+    :param histo_file_path:
+    :return:
+    """
+    # Step 1: Read the description_variables_meteo.csv file to create a mapping
+    description_df = pd.read_csv(description_file_path, sep=";")
+    mnemonique_to_libelle = dict(
+        zip(description_df["Mnémonique"], description_df["Libellé"])
+    )
+
+    # Step 2: Read the 59343001_histo.csv file
+    histo_df = pd.read_csv(histo_file_path, sep=";")
+
+    # Step 3: Rename the columns in 59343001_histo.csv using the mapping
+    histo_df.rename(columns=mnemonique_to_libelle, inplace=True)
+
+    # Step 4: Save the updated DataFrame back to the CSV file
+    histo_df.to_csv(histo_file_path, sep=";", index=False)
