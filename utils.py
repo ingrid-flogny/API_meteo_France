@@ -2,6 +2,8 @@ import urllib.parse
 import os
 import pandas as pd
 from datetime import datetime
+
+from config import PROJECT_ROOT
 from logs.logging_config import logger
 
 """=====================================================================================================
@@ -84,7 +86,9 @@ def from_station_number_to_histo_file_path(station_number: int) -> str:
     :param station_number:
     :return:
     """
-    file_path = f"data_meteo_histo/{station_number}/{station_number}_histo.csv"
+    file_path = (
+        PROJECT_ROOT + f"/data_meteo_histo/{station_number}/{station_number}_histo.csv"
+    )
     return file_path
 
 
@@ -98,7 +102,10 @@ def from_date_start_end_to_path_name(
     :param date_end:
     :return:
     """
-    file_name = f"data_meteo_histo/{station_number}/from{date_start}_to{date_end}.csv"
+    file_name = (
+        PROJECT_ROOT
+        + f"/data_meteo_histo/{station_number}/from{date_start}_to{date_end}.csv"
+    )
     return file_name
 
 
