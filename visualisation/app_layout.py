@@ -1,11 +1,29 @@
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 
+from visualisation.weather_data import get_all_stations_ids_retrieved
+
 
 def app_visualisation_layout(columns: list) -> html.Div:
+    station_ids = get_all_stations_ids_retrieved()
+
     return html.Div(
         [
             html.H1("Weather Data Visualization"),
+            html.Div(
+                [
+                    html.Label("Select Weather Station ID:"),
+                    dcc.Dropdown(
+                        id="station-id-dropdown",
+                        options=[
+                            {"label": str(station_id), "value": station_id}
+                            for station_id in station_ids
+                        ],
+                        value=station_ids[0],  # Default value
+                    ),
+                ]
+            ),
+            html.Hr(),
             html.Div(
                 [
                     html.Label("Select Variables:"),
