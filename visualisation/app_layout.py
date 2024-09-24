@@ -1,11 +1,13 @@
+import pandas as pd
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 
-from visualisation.weather_data import get_all_stations_ids_retrieved
+from visualisation.weather_data import get_unique_station_ids
 
 
-def app_visualisation_layout(columns: list) -> html.Div:
-    station_ids = get_all_stations_ids_retrieved()
+def app_visualisation_layout(df: pd.DataFrame) -> html.Div:
+    station_ids = get_unique_station_ids(df)
+    columns = df.columns
 
     return html.Div(
         [

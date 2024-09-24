@@ -31,16 +31,27 @@ def load_histo_weather_data_station(station_number: int) -> pd.DataFrame:
 
 
 """=====================================================================================================
-
+    Get stations IDs
 ===================================================================================================="""
 
 
 def get_all_stations_ids_retrieved() -> list:
     """
-    Get the list of all retrieved station IDs.
+    Get the list of all station IDs. Stations whose data has been retrieved in data_meteo_histo folder.
     :return:
     """
     # Get the list of all station numbers
     stations = os.listdir(PROJECT_ROOT + "/data_meteo_histo/")
     stations = [int(station) for station in stations]
     return stations
+
+
+def get_unique_station_ids(df: pd.DataFrame) -> list:
+    """
+    Get the unique station IDs from the DataFrame.
+
+    :param df: DataFrame containing weather data
+    :return: List of unique station IDs
+    """
+    unique_station_ids = df["POSTE"].unique().tolist()
+    return unique_station_ids
