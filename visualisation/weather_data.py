@@ -9,6 +9,16 @@ from utils import from_station_number_to_histo_file_path
 ===================================================================================================="""
 
 
+def load_histo_weather_data_all_stations() -> pd.DataFrame:
+    """
+    Load the historical data of all stations.
+    :return:
+    """
+    file_path = PROJECT_ROOT + "/data_meteo_histo/stations_weather_data_histo.csv"
+    df = pd.read_csv(file_path, delimiter=";", decimal=",")
+    return df
+
+
 def load_histo_weather_data_station(station_number: int) -> pd.DataFrame:
     """
     Get the historical data of a station from the CSV file.
