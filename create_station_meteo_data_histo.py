@@ -1,7 +1,9 @@
 import os
 import pandas as pd
 import time
+import re
 
+from config import PROJECT_ROOT
 from logs.logging_config import logger
 from CSVDownloader import CSVDownloader
 from utils import (
@@ -243,7 +245,7 @@ def verify_data_quality_in_histo_files(num_station: int) -> bool:
 
 """======================================================================================================================
 
-Repairing historical data files
+    Repairing historical data files
 
 ==========================================================================================================================="""
 
@@ -346,4 +348,33 @@ def download_and_add_data_missing_dates(num_station: int) -> bool:
         f"Missing dates files downloaded and added to {station_histo_file_path}"
     )
 
+    return True
+
+
+"""=======================================================================================================================
+    Delete the year by year weather data files for a station
+========================================================================================================================"""
+
+
+def delete_yearly_files(num_station: int) -> bool:
+    """
+    Delete the year by year weather data files for a station.
+    Only files like fromYYYY-MM-DD_toYYYY-MM-DD.csv will be deleted.
+    :param num_station:
+    :return:
+    """
+    station_folder = PROJECT_ROOT + f"/data_meteo_histo/{num_station}"
+    station_files = os.listdir(station_folder)
+    station_files.sort()
+    if len(station_files) == 0:
+        raise FileNotFoundError(
+            f"No files found for station {num_station} in folder {station_folder}"
+        )
+
+    pattern = re.compile(r"^from\d{4}-\d{2}-\d{2}_to\d{4}-\d{2}-\d{2}\.csv$")
+    for file in station_files:
+        if pattern.match(file):
+            os.remove(f"{station_folder}/{file}")
+
+    logger.info(f"Yearly files for station {num_station} deleted. Checking OK")
     return True
