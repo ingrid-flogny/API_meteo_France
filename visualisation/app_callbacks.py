@@ -2,7 +2,7 @@ import pandas as pd
 from dash import Dash
 from dash.dependencies import Input, Output
 
-from visualisation.weather_data import load_histo_weather_data_station
+from visualisation.weather_data import filter_dataframe_by_poste
 
 
 def callbacks_app_visualisation(app: Dash, df: pd.DataFrame):
@@ -10,15 +10,13 @@ def callbacks_app_visualisation(app: Dash, df: pd.DataFrame):
         Output("variable-graph", "figure"),
         [Input("station-id-dropdown", "value"), Input("variables-dropdown", "value")],
     )
-    def update_variable_graph(station_id, variables):
+    def update_variable_graph(station_id: str, variables: list):
         # Load data for the selected station
-        df_station = load_histo_weather_data_station(station_id)
-        df_station["DATE"] = pd.to_datetime(df_station["DATE"])
-        df_station.set_index("DATE", inplace=True)
+        filtered_df = filter_dataframe_by_poste(df, station_id)
 
         # Create the figure for the selected variables
         data = [
-            {"x": df_station.index, "y": df_station[var], "type": "line", "name": var}
+            {"x": filtered_df.index, "y": filtered_df[var], "type": "line", "name": var}
             for var in variables
         ]
         variable_fig = {

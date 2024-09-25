@@ -20,7 +20,7 @@ class CSVDownloader:
     Date range must be 1 year maximum.
     """
 
-    def __init__(self, num_station: int, date_start: str, date_end: str):
+    def __init__(self, num_station: str, date_start: str, date_end: str):
         """
 
         :param num_station: Station number

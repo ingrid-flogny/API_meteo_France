@@ -46,7 +46,7 @@ date_start_end = {
     retry=retry_if_exception_type(Exception),
 )
 def download_weather_data_station_between_dates(
-    station_number: int, date_start: str, date_end: str
+    station_number: str, date_start: str, date_end: str
 ) -> bool:
     """
     Download the historical weather data for a station for a given date range.
@@ -74,7 +74,7 @@ def download_weather_data_station_between_dates(
     return False
 
 
-def download_histo_per_station(num_station: int) -> bool:
+def download_histo_per_station(num_station: str) -> bool:
     """
     Loop to download all historical data files for a station.
     Date ranges are defined in the date_start_end dictionary.
@@ -87,7 +87,7 @@ def download_histo_per_station(num_station: int) -> bool:
         )
 
 
-def verify_files_histo_all_exist(num_station: int) -> bool:
+def verify_files_histo_all_exist(num_station: str) -> bool:
     """
     Check if all historical weather data files exist for a station.
     Date ranges are defined in the date_start_end dictionary.
@@ -116,7 +116,7 @@ Agglomération des données météo historiques pour une station : 1 fichier par
 ========================================================================================================="""
 
 
-def aggregate_histo_data(num_station: int) -> bool:
+def aggregate_histo_data(num_station: str) -> bool:
     """
     Aggregate all historical weather data files for a station into a single file.
     The final format is a CSV file : num_station_histo.csv
@@ -160,7 +160,7 @@ Quality check for the aggregated historical data files
 =============================================================================================================="""
 
 
-def check_duplicated_dates(num_station: int) -> bool:
+def check_duplicated_dates(num_station: str) -> bool:
     """
     Check for duplicate dates in the final historical data file of a station.
     :param num_station:
@@ -182,7 +182,7 @@ def check_duplicated_dates(num_station: int) -> bool:
     return True
 
 
-def check_missing_dates(num_station: int) -> bool:
+def check_missing_dates(num_station: str) -> bool:
     """
     Check for missing dates in the final historical data file of a station.
     Check for missing dates between min date and max date.
@@ -212,7 +212,7 @@ def check_missing_dates(num_station: int) -> bool:
     return True
 
 
-def verify_data_quality_in_histo_files(num_station: int) -> bool:
+def verify_data_quality_in_histo_files(num_station: str) -> bool:
     """
     Verify the quality of the final historical data files for a station.
     Quality checks : duplicates and missing dates.
@@ -250,7 +250,7 @@ def verify_data_quality_in_histo_files(num_station: int) -> bool:
 ==========================================================================================================================="""
 
 
-def drop_date_duplicates(station_number: int) -> bool:
+def drop_date_duplicates(station_number: str) -> bool:
     """
     Drop duplicate dates in the final historical data file of a station.
     :param station_number:
@@ -272,7 +272,7 @@ def drop_date_duplicates(station_number: int) -> bool:
     return True
 
 
-def add_date_to_histo_file(file_paths: list, station_number: int) -> bool:
+def add_date_to_histo_file(file_paths: list, station_number: str) -> bool:
     """
     Add the data from a list of files to the aggregated final historical data file of a station.
     Add the data from files like from2017-01-01_to2018-01-01.csv to the final file 59343001_histo.csv
@@ -310,7 +310,7 @@ def add_date_to_histo_file(file_paths: list, station_number: int) -> bool:
     return True
 
 
-def download_and_add_data_missing_dates(num_station: int) -> bool:
+def download_and_add_data_missing_dates(num_station: str) -> bool:
     """
     Download the missing data files for a station and add them to the aggregated final historical data file.
     One file per missing date. One file is like from2017-01-01_to2017-01-01.csv
@@ -356,7 +356,7 @@ def download_and_add_data_missing_dates(num_station: int) -> bool:
 ========================================================================================================================"""
 
 
-def delete_yearly_files(num_station: int) -> bool:
+def delete_yearly_files(num_station: str) -> bool:
     """
     Delete the year by year weather data files for a station.
     Only files like fromYYYY-MM-DD_toYYYY-MM-DD.csv will be deleted.

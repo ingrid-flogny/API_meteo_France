@@ -19,7 +19,7 @@ def load_histo_weather_data_all_stations() -> pd.DataFrame:
     return df
 
 
-def load_histo_weather_data_station(station_number: int) -> pd.DataFrame:
+def load_histo_weather_data_station(station_number: str) -> pd.DataFrame:
     """
     Get the historical data of a station from the CSV file.
     :param station_number:
@@ -55,3 +55,22 @@ def get_unique_station_ids(df: pd.DataFrame) -> list:
     """
     unique_station_ids = df["POSTE"].unique().tolist()
     return unique_station_ids
+
+
+"""=====================================================================================================
+    Filter data
+===================================================================================================="""
+
+
+def filter_dataframe_by_poste(df: pd.DataFrame, poste_value: str) -> pd.DataFrame:
+    """
+    Filter the DataFrame by the 'POSTE' column.
+    :param df:
+    :param poste_value:
+    :return:
+    """
+    if "POSTE" not in df.columns:
+        raise ValueError("The DataFrame does not contain a 'POSTE' column.")
+
+    filtered_df = df[df["POSTE"] == poste_value]
+    return filtered_df

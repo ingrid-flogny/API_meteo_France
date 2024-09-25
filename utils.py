@@ -80,7 +80,7 @@ Path names
 ====================================================================================================="""
 
 
-def from_station_number_to_histo_file_path(station_number: int) -> str:
+def from_station_number_to_histo_file_path(station_number: str) -> str:
     """
     Get the file path for the final historical data of a station.
     :param station_number:
@@ -93,7 +93,7 @@ def from_station_number_to_histo_file_path(station_number: int) -> str:
 
 
 def from_date_start_end_to_path_name(
-    station_number: int, date_start: str, date_end: str
+    station_number: str, date_start: str, date_end: str
 ) -> str:
     """
     Get the file path for the historical data of a station on a given date range.
@@ -114,7 +114,7 @@ CSV HISTO
 ====================================================================================================="""
 
 
-def get_station_histo_df_from_csv(station_number: int) -> pd.DataFrame:
+def get_station_histo_df_from_csv(station_number: str) -> pd.DataFrame:
     """
     Get the historical data of a station from the CSV file.
     :param station_number:
