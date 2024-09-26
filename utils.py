@@ -58,28 +58,11 @@ def ensure_folder_exists(folder_path: str):
 
 
 """=====================================================================================================
-Files names
-====================================================================================================="""
-
-
-def from_station_histo_file_name_to_station_number(file_name: str) -> int:
-    """
-    Get the station number from the historical file name.
-    :param file_name:
-    :return:
-    """
-    # Extract the base name of the file
-    base_name = os.path.basename(file_name)
-
-    station_number_str = base_name.split("_")[0]
-    return int(station_number_str)
-
-
-"""=====================================================================================================
 Path names
 ====================================================================================================="""
 
 
+# Path to station histo file
 def from_station_number_to_histo_file_path(station_number: str) -> str:
     """
     Get the file path for the final historical data of a station.
@@ -92,6 +75,7 @@ def from_station_number_to_histo_file_path(station_number: str) -> str:
     return file_path
 
 
+# Path weather data per year
 def from_date_start_end_to_path_name(
     station_number: str, date_start: str, date_end: str
 ) -> str:
@@ -110,11 +94,11 @@ def from_date_start_end_to_path_name(
 
 
 """=====================================================================================================
-CSV HISTO
+Dataframe CSV HISTO
 ====================================================================================================="""
 
 
-def get_station_histo_df_from_csv(station_number: str) -> pd.DataFrame:
+def get_station_histo_df(station_number: str) -> pd.DataFrame:
     """
     Get the historical data of a station from the CSV file.
     :param station_number:
@@ -126,7 +110,7 @@ def get_station_histo_df_from_csv(station_number: str) -> pd.DataFrame:
 
 
 """=====================================================================================================
-Change column names
+    Weather data columns
 ====================================================================================================="""
 
 
@@ -151,3 +135,26 @@ def rename_columns_using_mapping(description_file_path: str, histo_file_path: st
 
     # Step 4: Save the updated DataFrame back to the CSV file
     histo_df.to_csv(histo_file_path, sep=";", index=False)
+
+
+def filter_columns_histo_file(
+    input_histo_file_path: str, output_histo_file_path: str, columns_to_keep: list
+):
+    """
+    Filter the columns in the historical data file.
+    :param histo_file_path:
+    :param columns_to_keep:
+    :return:
+    """
+    # Read the CSV file
+    df = pd.read_csv(input_histo_file_path, sep=";")
+
+    # Filter the columns
+    df = df[columns_to_keep]
+
+    # Save the updated DataFrame back to the CSV file
+    df.to_csv(output_histo_file_path, sep=";", index=False)
+
+    logger.info(f"Columns filtered in {output_histo_file_path}")
+
+    return True

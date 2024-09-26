@@ -11,7 +11,7 @@ from utils import (
     convert_date_to_iso,
     from_station_number_to_histo_file_path,
     from_date_start_end_to_path_name,
-    get_station_histo_df_from_csv,
+    get_station_histo_df,
 )
 from tenacity import (
     retry,
@@ -167,7 +167,7 @@ def check_duplicated_dates(num_station: str) -> bool:
     :return:
     """
     # Load station data histo file
-    df = get_station_histo_df_from_csv(num_station)
+    df = get_station_histo_df(num_station)
     dates = df.iloc[:, 1]
 
     # Check for duplicate dates
@@ -190,7 +190,7 @@ def check_missing_dates(num_station: str) -> bool:
     :return:
     """
     # Load station data histo file
-    df = get_station_histo_df_from_csv(num_station)
+    df = get_station_histo_df(num_station)
     dates = df.iloc[:, 1]
     station_histo_file_path = from_station_number_to_histo_file_path(num_station)
 
@@ -257,7 +257,7 @@ def drop_date_duplicates(station_number: str) -> bool:
     :return:
     """
     # Load station data histo file
-    df = get_station_histo_df_from_csv(station_number)
+    df = get_station_histo_df(station_number)
     dates = df.iloc[:, 1]
 
     # Check for duplicate dates
@@ -318,7 +318,7 @@ def download_and_add_data_missing_dates(num_station: str) -> bool:
     :return:
     """
     # Load station data histo file
-    df = get_station_histo_df_from_csv(num_station)
+    df = get_station_histo_df(num_station)
     dates = df.iloc[:, 1]
     station_histo_file_path = from_station_number_to_histo_file_path(num_station)
 
