@@ -16,17 +16,17 @@ from utils import filter_columns_histo_file, delete_space_in_colnames_file
 
 # Lille Lesquin station: 59343001
 
-num_station = "38524001"
-# Download all historical data for a station
-download_histo_per_station(num_station)
-verify_files_histo_all_exist(num_station)
-
-# Aggregate all historical data for a station
-aggregate_histo_data(num_station)
-verify_data_quality_in_histo_files(num_station)
-
-# Finish
-delete_yearly_files(num_station)
+# num_station = "38524001"
+# # Download all historical data for a station
+# download_histo_per_station(num_station)
+# verify_files_histo_all_exist(num_station)
+#
+# # Aggregate all historical data for a station
+# aggregate_histo_data(num_station)
+# verify_data_quality_in_histo_files(num_station)
+#
+# # Finish
+# delete_yearly_files(num_station)
 
 """=====================================================================================================
     Create full histo file : Aggregate weather histo files of all stations
