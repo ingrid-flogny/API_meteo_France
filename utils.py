@@ -158,3 +158,15 @@ def filter_columns_histo_file(
     logger.info(f"Columns filtered in {output_histo_file_path}")
 
     return True
+
+
+def delete_space_in_colnames_file(file_path: str) -> None:
+    """
+    Delete spaces in column names of a CSV file and save the changes.
+    :param file_path: Path to the CSV file.
+    """
+    df = pd.read_csv(file_path, sep=";")
+    df.columns = df.columns.str.replace(" ", "_")
+    df.to_csv(file_path, sep=";", index=False)
+
+    logger.info(f"Spaces deleted in column names of {file_path}")

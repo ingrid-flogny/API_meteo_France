@@ -8,7 +8,7 @@ from create_station_meteo_data_histo import (
     delete_yearly_files,
 )
 from manage_meteo_data import rename_columns_stations_histo_file
-from utils import filter_columns_histo_file
+from utils import filter_columns_histo_file, delete_space_in_colnames_file
 
 """=====================================================================================================
     Create weather histo file of a given station
@@ -16,28 +16,28 @@ from utils import filter_columns_histo_file
 
 # Lille Lesquin station: 59343001
 
-# num_station = '94042001'
-# # Download all historical data for a station
-# download_histo_per_station(num_station)
-# verify_files_histo_all_exist(num_station)
-#
-# # Aggregate all historical data for a station
-# aggregate_histo_data(num_station)
-# verify_data_quality_in_histo_files(num_station)
-#
-# # Finish
-# delete_yearly_files(num_station)
+num_station = "38524001"
+# Download all historical data for a station
+download_histo_per_station(num_station)
+verify_files_histo_all_exist(num_station)
+
+# Aggregate all historical data for a station
+aggregate_histo_data(num_station)
+verify_data_quality_in_histo_files(num_station)
+
+# Finish
+delete_yearly_files(num_station)
 
 """=====================================================================================================
     Create full histo file : Aggregate weather histo files of all stations
 ===================================================================================================="""
 
-# root_directory = PROJECT_ROOT + "/data_meteo_histo/"
-# output_file = PROJECT_ROOT + "/data_meteo_histo/stations_weather_data_histo.csv"
-#
-# station_files = get_existing_station_files(root_directory)
-# aggregate_station_files(station_files, output_file)
-# rename_columns_stations_histo_file()
+root_directory = PROJECT_ROOT + "/data_meteo_histo/"
+output_file = PROJECT_ROOT + "/data_meteo_histo/stations_weather_data_histo.csv"
+
+station_files = get_existing_station_files(root_directory)
+aggregate_station_files(station_files, output_file)
+rename_columns_stations_histo_file()
 
 
 """=====================================================================================================
@@ -76,10 +76,12 @@ columns_to_keep_in_histo_file = [
 
 input_histo_file = PROJECT_ROOT + "/data_meteo_histo/stations_weather_data_histo.csv"
 output_histo_file = (
-    PROJECT_ROOT + "/data_meteo_histo/stations_weather_data_histo_filtered.csv"
+    PROJECT_ROOT + "/data_meteo_histo/stations_weather_data_histo_col_filtered.csv"
 )
 
 
 filter_columns_histo_file(
     input_histo_file, output_histo_file, columns_to_keep_in_histo_file
 )
+
+delete_space_in_colnames_file(output_histo_file)
