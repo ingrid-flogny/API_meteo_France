@@ -75,27 +75,6 @@ def get_open_weather_stations(
     return stations_data
 
 
-def get_list_stations_in_a_departement(num_departement: int) -> List[int]:
-    """
-    Get the list of station IDs from a departement.
-    The json input contains all information about the stations.
-    :param num_departement: The number of the departement.
-    :return: List of station IDs.
-    """
-    try:
-        info_stations_per_departement = get_json_info_stations_departement(
-            num_departement
-        )
-        stations_data = load_json_from_bytes(info_stations_per_departement)
-        return [station["id"] for station in stations_data]
-    except KeyError as e:
-        logger.error(f"Key error: {e}")
-        raise
-    except Exception as e:
-        logger.error(f"Failed to get the list of station IDs: {e}")
-        raise
-
-
 def write_open_station_data_to_csv(stations_data: List[Dict[str, Any]], csv_file: str):
     """
     Write station data to a CSV file.
